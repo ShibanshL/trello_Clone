@@ -1,32 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { Children, useEffect, useState } from 'react'
 import DeleteIcon from '../assets/delete.svg'
 import CloseIcon from '../assets/close.svg'
+import EditIcon from '../assets/edit.svg'
 
 import { Container, Draggable } from "react-smooth-dnd";
-// import { applyDrag, generateItems } from "./utils";
-
-const lorem = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
-
-const columnNames = ["Lorem", "Ipsum", "Consectetur", "Eiusmod"];
-
-const cardColors = [
-  "azure",
-  "beige",
-  "bisque",
-  "blanchedalmond",
-  "burlywood",
-  "cornsilk",
-  "gainsboro",
-  "ghostwhite",
-  "ivory",
-  "khaki"
-];
-const pickColor = () => {
-  let rand = Math.floor(Math.random() * 10);
-  return cardColors[rand];
-};
 
 interface Props {
   setListData: React.Dispatch<React.SetStateAction<any>>;
@@ -56,51 +33,39 @@ const NewBoardFUNC:React.FC<Props>  = ({setListData,reset,setReset}) => {
       props: {
         orientation: "horizontal"
       },
-      children: generateItems(1, (i:number) => ({
-        id: `column${i}`,
-        type: "container",
-        name: 'First Task',
-        tempName:'',
-        props: {
-          orientation: "vertical",
-          className: "card-container"
-        },
-        children: generateItems(1, (j:any) => ({
-          type: "draggable",
-          id: `${i}${j}`,
-          props: {
-            className: "card",
-            // style: { backgroundColor:'green', marginTop:'10px' }
-          },
-          // data: lorem.slice(0, Math.floor(Math.random() * 30) + 30)+` ID = ${j}`
-          // data:`Demo Task`
+      children:[]
+      // children: generateItems(1, (i:number) => ({
+      //   id: `column${i}`,
+      //   type: "container",
+      //   name: 'First Task',
+      //   tempName:'',
+      //   props: {
+      //     orientation: "vertical",
+      //     className: "card-container"
+      //   },
+      //   children: generateItems(1, (j:any) => ({
+      //     type: "draggable",
+      //     id: `${i}${j}`,
+      //     props: {
+      //       className: "card",
+      //       // style: { backgroundColor:'green', marginTop:'10px' }
+      //     },
+      //     // data: lorem.slice(0, Math.floor(Math.random() * 30) + 30)+` ID = ${j}`
+      //     // data:`Demo Task`
 
-          data:{
-            name:'Demo Task',
-            description:'',
-            end_date:''
-          }
-        }))
-      }))
+      //     data:{
+      //       name:'Demo Task',
+      //       description:'',
+      //       end_date:''
+      //     }
+      //   }))
+      // }))
     })
 
     const addNewData = () => {
-        let local:any = scene
+        let local:any = {...scene}
 
-        // let pData = []
-
-        // console.log(typeof local.children)
-
-        // pData = []
-        // local = {
-        //   type: "container",
-        //   props: {
-        //     orientation: "horizontal"
-        //   },
-        //   children: generateItems(1, (i:number) => ())
-        // }
-
-        scene.children.push({
+        local.children.push({
           id: `column${local.children}`,
           type: "container",
           name: listName,
@@ -112,11 +77,7 @@ const NewBoardFUNC:React.FC<Props>  = ({setListData,reset,setReset}) => {
           children: []
         })
 
-        // pData.push(1)
-
-        // console.log('Diidy',scene)
-
-        setScene(scene)
+        setScene(local)
 
         setListName('')
 
@@ -145,37 +106,23 @@ const NewBoardFUNC:React.FC<Props>  = ({setListData,reset,setReset}) => {
           newColumn.children = applyDrag(newColumn.children, dropResult);
           Local_scene.children.splice(columnIndex, 1, newColumn);
     
-        //   this.setState({
-            setScene(Local_scene)
-        //   });
+          setScene(Local_scene)
         }
       }
 
       const handleChange = (e:any, val:any) => {
-        // console.log(e,val)
-
-
         const updatedData = { ...scene };
-        // Find the child and subChild by sID, and update its name
         updatedData.children.forEach((child:any) => {
-          // child.subChildren.forEach((subChild) => {
             if (child.id === val) {
-              child.tempName = e; // Update the name dynamically
+              child.tempName = e;
             }
-          // });
         });
-
-        // console.log(updatedData)
-    
-        // Set the updated data back to the state
         setScene(updatedData);
       }
 
       const handleAddNewCard = (id:any) => {
         const updatedData = { ...scene };
-        // Find the child and subChild by sID, and update its name
         updatedData.children.forEach((child:any) => {
-          // child.subChildren.forEach((subChild) => {
             if (child.id === id) {
               child.children.push({
                 type: "draggable",
@@ -197,78 +144,47 @@ const NewBoardFUNC:React.FC<Props>  = ({setListData,reset,setReset}) => {
       }
 
       const DeleteCard = (cid:any,id:number) => {
-        // console.log(cid,id)
-
         let val = {...scene}
-
         let newArray = val.children[cid].children.filter((obj:any, idx:number) => idx !== id)
-        // val = val.children[cid].children.splice(id,1)
-
         val.children[cid].children = newArray
-        
-        // console.log(newArray)
-
-
         setScene(val)
       }
 
       const EditCard = (cid:number,id:number) => {
         setPopoverOpen(true)
-
         setCurrentID({...currentID,columnID:cid,cardID:id})
         let val = {...scene}
-
         let newArray = val.children[cid].children.filter((obj:any, idx:number) => idx == id)
-
-        console.log(newArray)
-
         setEditCard({...editCard, name:newArray[0].data.name, description:newArray[0].data.description?newArray[0].data.description:'' , end_date:newArray[0].data.end_date?newArray[0].data.end_date:''})
       }
 
       const SubmitEditCard = (cid:number,id:number) => {
         setPopoverOpen(true)
         let val = {...scene}
-
         let newArray = val.children[cid].children.filter((obj:any, idx:number) => idx == id)
-
-        // console.log(newArray)
-
         newArray[0].data = {...editCard};
-
         const emptyCard = {
           name:'',
           description:'',
           end_date:''
-      }
-
-      setEditCard(emptyCard)
-
-        // console.log(val)
-
-      setScene(val)
-      setPopoverOpen(false)
-
-
-        // setEditCard({...editCard, name:newArray[0].data.name, description:newArray[0].data.description , end_date:newArray[0].data.end_date})
+        }
+        setEditCard(emptyCard)
+        setScene(val)
+        setPopoverOpen(false)
       }
 
       const onDeleteList = (id:number) => {
         let val = {...scene}
-
-
         let newArray = val.children.filter((obj:any, idx:number) => idx !== id)
-        // val = val.children[cid].children.splice(id,1)
-
         val.children = newArray
-
         setScene(val)
       }
 
 
       useEffect(() => {
-        // if(scene.children.length > 0){
+        if(scene.children.length > 0){
           localStorage.setItem('sceneLocal',JSON.stringify(scene))
-        // }
+        }
 
         setListData(scene)
       },[scene])
@@ -282,16 +198,17 @@ const NewBoardFUNC:React.FC<Props>  = ({setListData,reset,setReset}) => {
             },
             children:[]
           })
+          localStorage.removeItem('sceneLocal')
           setReset(false)
         }
       },[reset])
 
-      // useEffect(() => {
-      //   let newScene = localStorage.getItem('sceneLocal')
-      //   if(newScene){
-      //     setScene(JSON.parse(newScene))
-      //   }
-      // },[])
+      useEffect(() => {
+        let newScene = localStorage.getItem('sceneLocal')
+        if(newScene){
+          setScene(JSON.parse(newScene))
+        }
+      },[])
 
   return (
     <div className='Board'>
@@ -300,7 +217,6 @@ const NewBoardFUNC:React.FC<Props>  = ({setListData,reset,setReset}) => {
             <button type="button" disabled={listName?false:true} className='AddList' onClick={addNewData}>add</button>
           </div>
           <div className="card-scene">
-          {/* <div className="MainBoard_1"> */}
             <Container
               orientation="horizontal"
               onDrop={onColumnDrop}
@@ -365,7 +281,8 @@ const NewBoardFUNC:React.FC<Props>  = ({setListData,reset,setReset}) => {
                                   <div className='card_Desc'>
                                     <h3>{card.data.name}</h3>
                                     <div className="CardButtons">
-                                      <button>S</button><button>W</button>
+                                    <img src={EditIcon} onClick={() => EditCard(index,idx)} style={{width:'25px',cursor:'pointer'}} alt="" />
+                                    <img src={DeleteIcon} onClick={() => DeleteCard(index,idx)} style={{width:'25px',cursor:'pointer'}} alt="" />
                                     </div>
                                   </div>
                                   <div className="card_Description">
@@ -378,8 +295,8 @@ const NewBoardFUNC:React.FC<Props>  = ({setListData,reset,setReset}) => {
                                 <div className='card'>
                                   <h3>{card.data.name}</h3>
                                   <div className="CardButtons">
-                                    <button onClick={() => EditCard(index,idx)}>S</button>
-                                    <button onClick={() => DeleteCard(index,idx)}>W</button>
+                                      <img src={EditIcon} onClick={() => EditCard(index,idx)} style={{width:'25px',cursor:'pointer'}} alt="" />
+                                      <img src={DeleteIcon} onClick={() => DeleteCard(index,idx)} style={{width:'25px',cursor:'pointer'}} alt="" />
                                   </div>
                                 </div>
                               </>
@@ -387,12 +304,12 @@ const NewBoardFUNC:React.FC<Props>  = ({setListData,reset,setReset}) => {
                             </Draggable>
                             </>
                           );
-                        }):'no'}
+                        }):'No Cards yet !!'}
                       </Container>
                     </div>
                   </Draggable>
                 );
-              }):'NO data yet'}
+              }):'No Lists yet !!'}
             </Container>
           {/* </div> */}
           </div>
@@ -442,21 +359,3 @@ export const applyDrag = (arr:any, dragResult:any) => {
     }
     return result;
   };
-
-  // <div className="Individual_Sub_Cards_1">
-  //                                 <div className="TopBar_Cards">
-  //                                   <h3>{card.data.name}</h3>
-                                   
-  //                                 </div>
-  //                                 {card.data.description?<div className="BottomBar_Cards">
-  //                                   {card.data.description}
-  //                                 </div>:''}
-  //                             </div>
-  //                             <div className="Card_Buttons">
-  //                                     <button onClick={() => DeleteCard(index,idx)}>
-  //                                      D
-  //                                     </button>
-  //                                     <button onClick={() => EditCard(index,idx)}>
-  //                                       E
-  //                                     </button>
-  //                                   </div>
